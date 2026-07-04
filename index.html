@@ -3,416 +3,616 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة إخراج كراكاتوا- الاسكريبت التفاعلي</title>
-    
-    <!-- تحميل مكتبة Tailwind CSS -->
+    <title>النسخة الطويلة الفايرال - براكين غيروا التاريخ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- تحميل خطوط جوجل (Cairo) لدعم اللغة العربية بشكل احترافي -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- تحميل أيقونات FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Cairo', 'sans-serif'],
-                    },
-                    colors: {
-                        volcano: {
-                            100: '#ffedd5',
-                            500: '#f97316',
-                            600: '#ea580c',
-                            900: '#7c2d12',
-                            dark: '#111827',
-                            darker: '#030712',
-                            card: '#1f2937'
-                        }
-                    }
+                    fontFamily: { 'sans': ['Cairo', 'sans-serif'] },
+                    colors: { volcano: { 500: '#f97316', 600: '#ea580c' }, dark: { 800: '#1e293b', 900: '#0f172a' } }
                 }
             }
         }
     </script>
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #030712; /* volcano-darker */
-            color: #f3f4f6;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            /* منع تحديد النص بالماوس لحماية المحتوى */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
-        .glass-panel {
-            background: rgba(31, 41, 55, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tab-btn {
-            transition: all 0.3s ease;
-        }
-        
-        .tab-btn.active {
-            background-color: #ea580c; /* volcano-600 */
-            color: white;
-            border-color: #ea580c;
-        }
-
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* تنسيق مخصص للنص الكامل */
-        .script-text p {
-            margin-bottom: 1.25rem;
-            line-height: 1.8;
-            font-size: 1.125rem;
-        }
-        
-        /* تأثير النبض البسيط للأيقونات */
-        .pulse-icon {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        body { background-color:#0f172a; color:#e2e8f0; font-family:'Cairo',sans-serif; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background:#1e293b; }
+        ::-webkit-scrollbar-thumb { background:#475569; border-radius:4px; }
+        ::-webkit-scrollbar-thumb:hover { background:#f97316; }
+        .script-content p { margin-bottom:1.05rem; line-height:1.9; font-size:1.08rem; }
+        .script-content strong { color:#f97316; font-weight:800; }
+        .script-content h3 { scroll-margin-top: 6rem; }
+        .glass-panel { background:rgba(30,41,59,.72); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); }
+        .btn-action { transition: transform .15s ease, box-shadow .15s ease; }
+        .btn-action:active { transform: scale(.97); }
+        .btn-action:focus-visible { outline: 2px solid #f97316; outline-offset: 2px; }
+        #toast { transform: translateY(120%); opacity: 0; transition: transform .3s ease, opacity .3s ease; }
+        #toast.show { transform: translateY(0); opacity: 1; }
     </style>
 </head>
-<body class="antialiased min-h-screen bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
-
-    <div class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
-        
-        <!-- Header Section -->
-        <header class="text-center mb-10">
-            <div class="inline-block p-4 rounded-full bg-volcano-900/30 border border-volcano-500/30 mb-4">
-                <i class="fa-solid fa-volcano text-4xl text-volcano-500 pulse-icon"></i>
-            </div>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
-                كراكاتوا <span class="text-volcano-500">غضب الأرض</span>
-            </h1>
-            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
-                لوحة إخراج تفاعلية لقصة أعنف انفجار بركاني في التاريخ المسجل.
-            </p>
-        </header>
-
-        <!-- Tabs Navigation -->
-        <div class="flex justify-center mb-8">
-            <div class="inline-flex glass-panel rounded-full p-1 w-full max-w-md">
-                <button onclick="switchTab('full-script')" id="btn-full-script" class="tab-btn active flex-1 py-3 px-6 rounded-full text-sm sm:text-base font-bold text-gray-300 hover:text-white outline-none focus:outline-none">
-                    <i class="fa-solid fa-file-lines ml-2"></i> النص الكامل
-                </button>
-                <button onclick="switchTab('scenes')" id="btn-scenes" class="tab-btn flex-1 py-3 px-6 rounded-full text-sm sm:text-base font-bold text-gray-300 hover:text-white outline-none focus:outline-none">
-                    <i class="fa-solid fa-clapperboard ml-2"></i> تقسيم المشاهد
-                </button>
+<body class="antialiased min-h-screen flex flex-col">
+<header class="glass-panel sticky top-0 z-50 border-b border-slate-700 shadow-lg">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-volcano-500 text-white p-2 rounded-lg"><i class="fa-solid fa-fire-flame-curved text-xl"></i></div>
+            <div>
+                <h1 class="text-xl font-bold text-white leading-tight">براكين غيروا التاريخ</h1>
             </div>
         </div>
-
-        <!-- Tab 1: Full Script Content -->
-        <div id="full-script" class="tab-content active">
-            <div class="glass-panel rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-                <!-- Decorative accent -->
-                <div class="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-volcano-500 to-red-800"></div>
-                
-                <div class="flex items-center justify-between mb-8 border-b border-gray-700 pb-4">
-                    <h2 class="text-2xl font-bold text-white flex items-center">
-                        <i class="fa-solid fa-microphone-lines text-volcano-500 ml-3"></i> اسكريبت التعليق الصوتي
-                    </h2>
-                </div>
-
-                <div class="script-text text-gray-200 text-right font-medium" id="script-text-container">
-                    <p>تخيل تسمع صوت انفجار…</p>
-                    <p>مش من شارعك…</p>
-                    <p>ولا من مدينتك…</p>
-                    <p>ولا حتى من بلدك.</p>
-                    <p class="text-volcano-100 font-bold text-2xl py-2">ده صوت اتسمع على بُعد آلاف الكيلومترات.</p>
-                    <p>في يوم 27 أغسطس سنة 1883،<br>
-                    انفجر بركان كراكاتوا في مضيق سوندا،<br>
-                    بين جزيرتي جاوة وسومطرة، في إندونيسيا الحالية.</p>
-                    <p>بس الكارثة ما بدأتش فجأة.</p>
-                    <p>من شهر مايو، السفن اللي كانت معدية من المنطقة بدأت تلاحظ دخان ورماد وانفجارات صغيرة طالعة من الجزيرة.</p>
-                    <p>الناس وقتها اتعاملت مع المشهد كأنه شيء غريب ومثير…<br>
-                    لكن محدش كان متخيل إن ده مجرد إنذار قبل واحدة من أعنف الكوارث الطبيعية في التاريخ.</p>
-                    <p>وفي صباح 27 أغسطس…<br>
-                    كراكاتوا انفجر بقوة مرعبة.</p>
-                    <p>الانفجار كان ضخم لدرجة إن جزء كبير من الجزيرة انهار في البحر،<br>
-                    والانهيار ده عمل موجات تسونامي هائلة،<br>
-                    وصل ارتفاعها في بعض التقديرات لقريب من 40 متر…<br>
-                    <span class="text-volcano-500 font-bold">يعني تقريبًا قد عمارة من 12 أو 13 دور.</span></p>
-                    <p>الموجات اتحركت ناحية سواحل جاوة وسومطرة،<br>
-                    وضربت قرى ومدن كاملة.</p>
-                    <p>في لحظات…<br>
-                    أماكن اختفت،<br>
-                    سواحل اتغير شكلها،<br>
-                    وعائلات كاملة اتشردت.</p>
-                    <p>والنتيجة كانت كارثية:<br>
-                    حوالي 36 ألف شخص فقدوا حياتهم،<br>
-                    ومعظمهم ماتوا بسبب التسونامي، مش بسبب الحمم البركانية نفسها.</p>
-                    <p>وقتها المنطقة كانت تحت حكم جزر الهند الشرقية الهولندية،<br>
-                    وماكانش فيه نظام إنذار مبكر،<br>
-                    ولا خطط إخلاء سريعة زي اللي ممكن نشوفها النهارده.</p>
-                    <p>الإدارة وقتها واجهت كارثة أكبر من قدرتها:<br>
-                    قرى مدمرة،<br>
-                    طرق وسواحل متغيرة،<br>
-                    وسكان محتاجين إنقاذ ومساعدة وسط فوضى ضخمة.</p>
-                    <p>لكن تأثير كراكاتوا ماوقفش عند إندونيسيا.</p>
-                    <p>الرماد والغازات طلعوا لطبقات عالية جدًا في الجو،<br>
-                    ولفّوا حوالين العالم،<br>
-                    وخلّوا السماء تتلون بغروب أحمر غريب في بلاد بعيدة،<br>
-                    وساهموا في انخفاض درجات الحرارة لفترة بعد الانفجار.</p>
-                    <p>كراكاتوا ماكانش مجرد بركان انفجر.</p>
-                    <p class="text-xl font-bold text-white border-r-4 border-volcano-500 pr-4 mt-6">
-                    ده كان صوت الأرض وهي بتصرخ…<br>
-                    صوت وصل لآلاف الكيلومترات،<br>
-                    وكارثة خلت العالم كله يفهم إن غضب الطبيعة…<br>
-                    ممكن يغيّر شكل الخريطة في لحظة.
-                    </p>
-                </div>
-            </div>
+        <div class="flex flex-wrap items-center justify-center gap-2">
+            <button type="button" onclick="downloadScript('txt')" aria-label="تحميل TXT" class="btn-action flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-md"><i class="fa-regular fa-file-lines"></i><span>TXT</span></button>
+            <button type="button" onclick="downloadScript('md')" aria-label="تحميل Markdown" class="btn-action flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-md"><i class="fa-brands fa-markdown"></i><span>Markdown</span></button>
+            <button type="button" onclick="downloadScript('word')" aria-label="تحميل Word" class="btn-action flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md shadow-md shadow-blue-900/50"><i class="fa-solid fa-file-word"></i><span>Word</span></button>
+            <button type="button" onclick="copyToClipboard()" aria-label="نسخ النص" class="btn-action flex items-center gap-2 px-4 py-2 bg-volcano-500 hover:bg-volcano-600 text-white text-sm rounded-md shadow-md shadow-volcano-900/50"><i class="fa-regular fa-copy"></i><span id="copyText">نسخ النص</span></button>
         </div>
-
-        <!-- Tab 2: Scenes Breakdown Content -->
-        <div id="scenes" class="tab-content">
-            <div class="space-y-6">
-                
-                <!-- Scene 1 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">01</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الخطفة (Hook)</span>
-                            <span class="mt-2 text-xs bg-gray-900 px-2 py-1 rounded text-gray-300">00:00 - 00:05</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-xl text-white font-semibold leading-relaxed mb-4">
-                                "تخيل تسمع صوت انفجار… مش من شارعك… ولا من مدينتك… ولا حتى من بلدك. ده صوت اتسمع على بُعد آلاف الكيلومترات."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> شاشة سوداء أو لقطات سريعة جداً لشوارع مظلمة، تليها خريطة لكوكب الأرض تومض من نقطة واحدة.
-                                </div>
-                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> هدوء تام يقطعه صوت انفجار مكتوم (Sub-bass boom) ثم تصاعد موسيقى غامضة.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 2 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">02</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">التمهيد (Setup)</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
-                                "في يوم 27 أغسطس سنة 1883، انفجر بركان كراكاتوا في مضيق سوندا، بين جزيرتي جاوة وسومطرة، في إندونيسيا الحالية."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> خريطة قديمة (Vintage Map) زووم إن على إندونيسيا، مع تحديد جاوة وسومطرة.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 3 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">03</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الهدوء قبل العاصفة</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
-                                "بس الكارثة ما بدأتش فجأة. من شهر مايو، السفن اللي معدية بدأت تلاحظ دخان ورماد وانفجارات صغيرة... الناس اتعاملت مع المشهد كأنه شيء غريب ومثير… لكن محدش كان متخيل إن ده إنذار لـ أعنف كارثة."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> صور أرشيفية أو ذكاء اصطناعي لسفن شراعية في البحر تراقب عمود دخان صغير من بعيد.
-                                </div>
-                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> أصوات رياح بحرية، طيور نورس، ثم يبدأ الإيقاع الموسيقي في التوتر تدريجياً.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 4 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-red-900 hover:border-red-500 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-red-900/20 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700 relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-red-900/40 to-transparent"></div>
-                            <span class="text-red-500 font-black text-4xl mb-1 relative z-10">04</span>
-                            <span class="text-red-300 font-bold uppercase tracking-wider text-sm relative z-10">الذروة (Climax)</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-xl text-white font-bold leading-relaxed mb-4">
-                                "وفي صباح 27 أغسطس… كراكاتوا انفجر بقوة مرعبة. الانفجار كان ضخم لدرجة إن جزء كبير من الجزيرة انهار في البحر، والانهيار ده عمل موجات تسونامي هائلة، وصل ارتفاعها لـ 40 متر… يعني تقريبًا قد عمارة من 12 أو 13 دور."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> لقطات انفجار بركاني عنيف، يعقبها رسم توضيحي أو 3D يوضح ارتفاع الموجة (40 متر) مقارنة بعمارة سكنية.
-                                </div>
-                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> مؤثر صوتي لانفجار ضخم يتبعه صوت هدير أمواج مرعب (Rumbling water).
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 5 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">05</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الدمار الكامل</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
-                                "الموجات اتحركت ناحية سواحل جاوة وسومطرة، وضربت قرى ومدن كاملة. في لحظات… أماكن اختفت، سواحل اتغير شكلها، وعائلات كاملة اتشردت. حوالي 36 ألف شخص فقدوا حياتهم."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> لقطات بطيئة (Slow-mo) للخراب، أشجار مدمرة، وبحر هائج. ظهور رقم "36,000" على الشاشة ببنط عريض.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 6 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">06</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">العجز الإداري</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
-                                "وقتها المنطقة كانت تحت حكم جزر الهند الشرقية الهولندية، وماكانش فيه نظام إنذار مبكر... الإدارة واجهت كارثة أكبر من قدرتها: قرى مدمرة وسكان محتاجين إنقاذ وسط فوضى ضخمة."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> صور تاريخية بالأبيض والأسود للمسؤولين في هذا العصر أو برقيات التلغراف.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 7 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">07</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">التأثير العالمي</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
-                                "لكن تأثير كراكاتوا ماوقفش عند إندونيسيا. الرماد والغازات طلعوا لطبقات عالية، ولفّوا حوالين العالم، وخلّوا السماء تتلون بغروب أحمر غريب، وساهموا في انخفاض درجات الحرارة."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> أنيميشن للرماد يغطي الكرة الأرضية، ثم صورة لغروب شمس بلون أحمر دموي أو برتقالي داكن (مثل لوحة الصرخة المقتبسة من نفس الحدث).
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Scene 8 -->
-                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
-                            <span class="text-volcano-500 font-black text-4xl mb-1">08</span>
-                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الخاتمة (Outro)</span>
-                        </div>
-                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
-                            <p class="text-xl text-white font-bold leading-relaxed mb-4 border-r-4 border-volcano-500 pr-3">
-                                "كراكاتوا ماكانش مجرد بركان انفجر. ده كان صوت الأرض وهي بتصرخ… صوت وصل لآلاف الكيلومترات، وكارثة خلت العالم كله يفهم إن غضب الطبيعة… ممكن يغيّر شكل الخريطة في لحظة."
-                            </p>
-                            <div class="flex flex-wrap gap-3 mt-auto">
-                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> لقطة واسعة جداً (Wide shot) للمحيط الهادي، ثم تظهر دعوة للتفاعل (Follow/Like).
-                                </div>
-                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
-                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> الموسيقى تصل لذروة درامية ثم تنقطع فجأة مع آخر كلمة (في لحظة).
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
     </div>
-
-    <script>
-        // دالة التبديل بين التابات
-        function switchTab(tabId) {
-            // إخفاء كل المحتوى
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.remove('active');
-            });
-            
-            // إزالة التنشيط من كل الأزرار
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('active');
-                el.classList.add('text-gray-300');
-            });
-
-            // إظهار المحتوى المطلوب وتنشيط الزر
-            document.getElementById(tabId).classList.add('active');
-            
-            const activeBtn = document.getElementById('btn-' + tabId);
-            activeBtn.classList.add('active');
-            activeBtn.classList.remove('text-gray-300');
-        }
-
-        // منع النقر بزر الماوس الأيمن (Context Menu) لحماية المحتوى
-        document.addEventListener('contextmenu', event => event.preventDefault());
-
-        // منع اختصارات الكيبورد الخاصة بالنسخ والتحديد (Ctrl+C, Ctrl+A, Cmd+C, Cmd+A)
-        document.addEventListener('keydown', function(event) {
-            if ((event.ctrlKey || event.metaKey) && (event.key === 'c' || event.key === 'a' || event.key === 'x' || event.key === 'C' || event.key === 'A' || event.key === 'X')) {
-                event.preventDefault();
-            }
-        });
-
-        // منع حدث النسخ نفسه كإجراء أمان إضافي
-        document.addEventListener('copy', function(event) {
-            event.preventDefault();
-        });
-    </script>
+</header>
+<main class="flex-grow max-w-4xl mx-auto w-full px-4 py-8">
+    <nav class="mb-8 glass-panel rounded-xl p-5 border border-slate-700" aria-label="فهرس الأقسام">
+        <h3 class="text-sm font-bold text-volcano-500 mb-3"><i class="fa-solid fa-list-ul ml-2"></i>فهرس الأقسام</h3>
+        <div class="grid sm:grid-cols-2 gap-2 text-sm">
+            <a href="#section-tambora" class="text-slate-300 hover:text-volcano-500 transition">١. تامبورا — البركان اللي سرق الصيف</a>
+            <a href="#section-transition-krakatoa" class="text-slate-300 hover:text-volcano-500 transition">٢. انتقال إلى كراكاتوا</a>
+            <a href="#section-krakatoa" class="text-slate-300 hover:text-volcano-500 transition">٣. كراكاتوا — لما الأرض صرخت</a>
+            <a href="#section-transition-vesuvius" class="text-slate-300 hover:text-volcano-500 transition">٤. انتقال إلى فيزوف</a>
+            <a href="#section-vesuvius" class="text-slate-300 hover:text-volcano-500 transition">٥. فيزوف — المدينة اللي نامت تحت الرماد</a>
+            <a href="#section-conclusion" class="text-slate-300 hover:text-volcano-500 transition">٦. الربط النهائي والخاتمة</a>
+            <a href="#section-note" class="text-slate-300 hover:text-volcano-500 transition">٧. ملاحظة تحقق سريعة</a>
+        </div>
+    </nav>
+    <div id="scriptContainer" class="bg-slate-800 rounded-xl shadow-2xl border border-slate-700 overflow-hidden">
+        <div class="bg-slate-900 px-8 py-6 border-b border-slate-700 text-center">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-2">3 براكين غيروا التاريخ</h2>
+            <p class="text-volcano-500 font-semibold text-lg">والحمم ماكانتْش أخطر حاجة...</p>
+        </div>
+        <div class="p-8 md:p-10 script-content text-slate-300" id="readableScript">
+            <p>في بركان قتل الناس بالبحر…</p>
+<p>وبركان تاني سرق الصيف من الكوكب كله…</p>
+<p>وبركان تالت دفن مدينة كاملة…</p>
+<p>وخلى الزمن كأنه وقف عندها ألفين سنة.</p>
+<p><strong>والأغرب؟</strong></p>
+<p>إن أخطر حاجة في التلات براكين دول ماكانتْش الحمم.</p>
+<p>النهارده هنتكلم عن 3 جبال غيروا تاريخ البشرية.</p>
+<p>تامبورا…</p>
+<p>البركان اللي خلّى العالم يدخل <strong>سنة بلا صيف.</strong></p>
+<p>كراكاتوا…</p>
+<p>البركان اللي صوته اتسمع على بعد آلاف الكيلومترات.</p>
+<p>وفيزوف…</p>
+<p>البركان اللي دفن بومبي، وحوّل مدينة كاملة لصورة متجمدة من الماضي.</p>
+<p>بس قبل ما نبدأ…</p>
+<p>لازم تعرف إن البركان مش دايمًا بيقتل بالنار.</p>
+<p>أحيانًا بيقتل بالبحر.</p>
+<p>وأحيانًا بالجوع.</p>
+<p>وأحيانًا بيقتل مدينة…</p>
+<p>ويحفظ حكايتها في نفس الوقت.</p>
+<h3 id="section-tambora" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">الجزء الأول: تامبورا — البركان اللي سرق الصيف</h3>
+<p>أول بركان معانا هو تامبورا.</p>
+<p>ولو هنتكلم عن بركان غيّر العالم بجد…</p>
+<p>فلازم نبدأ بيه.</p>
+<p>سنة 1815، في جزيرة اسمها سومباوا في إندونيسيا،</p>
+<p>كان فيه جبل ضخم اسمه تامبورا.</p>
+<p>الجبل ده قبل الانفجار كان ارتفاعه حوالي 4300 متر.</p>
+<p>يعني جبل عملاق…</p>
+<p>ساكت…</p>
+<p>ثابت…</p>
+<p>وكأنه جزء عادي من الطبيعة.</p>
+<p>بس الهدوء ده كان خدعة.</p>
+<p>جوه الجبل، كان فيه ضغط بيتراكم سنة ورا سنة.</p>
+<p>صهارة، غازات، وحرارة محبوسة تحت الأرض.</p>
+<p>وكل ما الضغط يزيد…</p>
+<p>الجبل كان بيقرب أكتر من لحظة الانفجار.</p>
+<p>وفي أبريل سنة 1815…</p>
+<p>الأرض ماقدرتش تستحمل أكتر.</p>
+<p><strong>تامبورا انفجر.</strong></p>
+<p>مش انفجار عادي.</p>
+<p>ده كان واحد من أضخم الانفجارات البركانية اللي البشر سجلوها في التاريخ.</p>
+<p>الانفجار كان عنيف لدرجة إن جزء كبير من الجبل نفسه اختفى.</p>
+<p>تخيل جبل ارتفاعه آلاف الأمتار…</p>
+<p>وفي لحظات، يفقد جزء ضخم من جسمه،</p>
+<p>ويتحول لفوهة عملاقة.</p>
+<p>الرماد طلع لارتفاع مرعب في السماء.</p>
+<p>والقرى القريبة من البركان اتحولت لجحيم.</p>
+<p>في ناس ماتت فورًا بسبب السحب النارية والرماد والمواد البركانية اللي نزلت من الجبل بسرعة وحرارة قاتلة.</p>
+<p>بس دي ماكنتش الكارثة الأكبر.</p>
+<p>ودي أول مفاجأة في قصة تامبورا:</p>
+<p>البركان ده ما قتلش بس الناس اللي كانوا جنبه.</p>
+<p><strong>تامبورا قتل ناس عمرهم ما شافوه.</strong></p>
+<p>إزاي؟</p>
+<p>عن طريق السماء.</p>
+<p>بعد الانفجار، كميات ضخمة من الرماد والغازات طلعت لطبقات عالية جدًا في الجو.</p>
+<p>والغازات دي عملت شبه ستارة حوالين الأرض.</p>
+<p>ستارة حجبت جزء من ضوء الشمس.</p>
+<p>والنتيجة؟</p>
+<p>السنة اللي بعدها، سنة 1816، اتعرفت باسم:</p>
+<p><strong>سنة بلا صيف.</strong></p>
+<p>تخيل معايا…</p>
+<p>إحنا في شهر يونيو.</p>
+<p>المفروض شمس، حر، زرع، وحصاد.</p>
+<p>لكن بدل ده…</p>
+<p>برد غريب.</p>
+<p>تلج في أماكن المفروض تكون في عز الصيف.</p>
+<p>محاصيل بتتجمد وتموت.</p>
+<p>مواشي مش لاقية أكل.</p>
+<p>وناس بتصحى تلاقي موسم الزراعة كله انتهى قبل ما يبدأ.</p>
+<p>في أوروبا وأمريكا الشمالية، المحاصيل فشلت.</p>
+<p>أسعار الأكل زادت.</p>
+<p>المجاعات انتشرت.</p>
+<p>والناس بدأت تعاني من الجوع والمرض.</p>
+<p>يعني بركان في جزيرة بعيدة…</p>
+<p>خلّى ناس في بلاد تانية تبرد وتجوع وتمرض…</p>
+<p>من غير ما يكونوا حتى عارفين اسمه.</p>
+<p><strong>والأغرب؟</strong></p>
+<p>إن الناس وقتها ماكانتش فاهمة إن السبب الحقيقي هو بركان.</p>
+<p>في ناس قالت دي علامات غضب إلهي.</p>
+<p>وناس ربطت الموضوع بالمذنبات.</p>
+<p>وناس افتكرت إن الشمس نفسها حصلها حاجة.</p>
+<p>وده مفهوم…</p>
+<p>لأن العلم وقتها ماكانش لسه فاهم العلاقة بين البراكين والمناخ.</p>
+<p>محدش كان متخيل إن جبل في إندونيسيا…</p>
+<p>ممكن يغير طقس العالم كله.</p>
+<p>وقتها المنطقة كانت تحت إدارة بريطانية مؤقتة،</p>
+<p>والحاكم توماس ستامفورد رافلز كان موجود في باتافيا، اللي هي جاكرتا حاليًا.</p>
+<p>لما صوت الانفجارات اتسمع،</p>
+<p>في البداية افتكروه مدافع أو هجوم بحري.</p>
+<p>تخيل قوة الصوت كانت عاملة إزاي…</p>
+<p>لدرجة إن السلطة نفسها افتكرت إن فيه حرب.</p>
+<p>لكن بعد ما الرماد بدأ ينتشر،</p>
+<p>والتقارير بدأت توصل،</p>
+<p>اتضح إن اللي حصل مش هجوم…</p>
+<p>دي كارثة طبيعية ضخمة.</p>
+<p>اتبعث مسؤولين يشوفوا اللي حصل في سومباوا.</p>
+<p>واللي اتسجل وقتها كان مرعب:</p>
+<p>قرى مختفية.</p>
+<p>جثث في الطرق.</p>
+<p>مياه ملوثة.</p>
+<p>محاصيل مدفونة تحت الرماد.</p>
+<p>وناس نجت من الانفجار…</p>
+<p>لكنها بدأت تموت بعده من الجوع والمرض.</p>
+<p>وهنا لازم نقف عند درس مهم:</p>
+<p>أحيانًا الضربة الأولى في الكارثة مش هي الأخطر.</p>
+<p>الانفجار بيقتل في لحظة…</p>
+<p>لكن اللي بعده ممكن يقتل لشهور وسنين.</p>
+<p>تامبورا علم البشر إن الكوكب كله متوصل ببعضه.</p>
+<p>كارثة تحصل في جزيرة بعيدة،</p>
+<p>ممكن تغيّر الجو في قارة تانية،</p>
+<p>وتبوّظ الزراعة في بلد تالتة،</p>
+<p>وتسبب جوع ومرض في أماكن عمرها ما شافت البركان.</p>
+<p>تامبورا ماكنش مجرد جبل انفجر.</p>
+<p>تامبورا كان بركان طلع للسماء…</p>
+<p>ومن هناك، غيّر مصير البشر.</p>
+<p>تامبورا ببساطة…</p>
+<p>سرق الصيف من العالم.</p>
+<p>ودلوقتي تخيل لو كارثة زي دي حصلت في عصرنا الحالي…</p>
+<p>والعالم كله معتمد على الإنترنت، الشحن، الزراعة الحديثة، وسلاسل الإمداد.</p>
+<p>تفتكر أول حاجة هتنهار؟</p>
+<p>الأكل؟</p>
+<p>الكهربا؟</p>
+<p>ولا الاقتصاد؟</p>
+<p>اكتبلي رأيك في التعليقات…</p>
+<p>لأن إجابة السؤال ده مرعبة أكتر مما نتخيل.</p>
+<h3 id="section-transition-krakatoa" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">انتقال إلى كراكاتوا</h3>
+<p>بس لو تامبورا كان البركان اللي خلّى العالم يبرد…</p>
+<p>فالبركان اللي جاي عمل حاجة أغرب.</p>
+<p>بركان صرخ…</p>
+<p>والكوكب سمعه.</p>
+<p>صوته اتسمع على بعد آلاف الكيلومترات.</p>
+<p>وانفجاره حرّك البحر نفسه.</p>
+<p>وده ياخدنا لكراكاتوا.</p>
+<h3 id="section-krakatoa" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">الجزء الثاني: كراكاتوا — لما الأرض صرخت</h3>
+<p>سنة 1883.</p>
+<p>في مضيق سوندا، بين جزيرتي جاوة وسومطرة في إندونيسيا الحالية،</p>
+<p>كان فيه جزيرة بركانية اسمها كراكاتوا.</p>
+<p>جزيرة في النص بين البحر والنار.</p>
+<p>من بره، شكلها عادي.</p>
+<p>لكن من جوه…</p>
+<p>الأرض كانت بتغلي.</p>
+<p>من شهر مايو في نفس السنة،</p>
+<p>السفن اللي كانت معدية في المنطقة بدأت تلاحظ حاجات غريبة.</p>
+<p>دخان طالع من الجزيرة.</p>
+<p>رماد في الجو.</p>
+<p>انفجارات صغيرة.</p>
+<p>أصوات مكتومة.</p>
+<p>المشهد كان مخيف…</p>
+<p>بس في نفس الوقت، فيه ناس وقتها اتعاملت معاه كأنه منظر غريب يستاهل الفرجة.</p>
+<p>وده واحد من أخطر أنواع الهدوء:</p>
+<p>لما الكارثة تبدأ تديك إشارات…</p>
+<p>بس الناس تفتكرها مجرد عرض طبيعي.</p>
+<p>الأيام عدت.</p>
+<p>والنشاط زاد.</p>
+<p>والجزيرة بدأت تبعت تحذيراتها الأخيرة.</p>
+<p>لحد ما جه يوم 27 أغسطس سنة 1883.</p>
+<p>في الصبح…</p>
+<p><strong>كراكاتوا انفجر.</strong></p>
+<p>والانفجار ده ماكانش مجرد انفجار بركاني.</p>
+<p>ده كان حدث عالمي.</p>
+<p>الصوت اتسمع على بعد آلاف الكيلومترات.</p>
+<p>تخيل تبقى واقف في القاهرة…</p>
+<p>وتسمع بوضوح صوت انفجار حصل في باريس.</p>
+<p>مش خبر في التليفزيون.</p>
+<p>مش إشعار على الموبايل.</p>
+<p>صوت حقيقي واصل لودنك.</p>
+<p>ده تقريبًا حجم الرعب اللي عمله كراكاتوا.</p>
+<p>ناس في أماكن بعيدة جدًا سمعوا الدوي المرعب،</p>
+<p>وافتكروه مدافع أو حرب.</p>
+<p>كأن الأرض نفسها صرخت…</p>
+<p>والكوكب كله سمعها.</p>
+<p>لكن المفاجأة؟</p>
+<p>الصوت ماكانش أخطر حاجة.</p>
+<p>الانفجار كان قوي لدرجة إن جزء كبير من الجزيرة انهار في البحر.</p>
+<p>وهنا بدأت الكارثة الحقيقية.</p>
+<p>فيه ناس بتفتكر إن كراكاتوا ببساطة “غرق”…</p>
+<p>كأن البحر ابتلع الجزيرة مرة واحدة.</p>
+<p>لكن الحقيقة العلمية أشرس من كده.</p>
+<p>الانفجار فرّغ جزء ضخم من حجرة الصهارة اللي تحت الجزيرة.</p>
+<p>يعني الأرض اللي كانت شايلة الجزيرة من تحت…</p>
+<p>بقت فاضية فجأة.</p>
+<p>فلما الدعم اختفى،</p>
+<p>جزء كبير من الجزيرة انهار لجوه،</p>
+<p>زي سقف بيت يقع لما العواميد اللي شايلينه تتكسر.</p>
+<p>بس الانهيار ده حصل فين؟</p>
+<p>في البحر.</p>
+<p>وهنا البحر اتحول لسلاح.</p>
+<p>المياه اندفعت بعنف،</p>
+<p>واتولدت موجات تسونامي ضخمة.</p>
+<p>مش موجة عادية.</p>
+<p>في بعض التقديرات، ارتفاع الموجة وصل لحوالي 40 متر.</p>
+<p>يعني تخيل جدار مياه قد عمارة من 13 دور…</p>
+<p>مش واقف مكانه…</p>
+<p>ده بيتحرك ناحية الساحل بسرعة وقوة تكفي تشيل بيوت، مراكب، أشجار، وناس في ثواني.</p>
+<p>والموجة دي ما بتخبطش وبس.</p>
+<p>دي بتمسح.</p>
+<p>بيوت.</p>
+<p>مراكب.</p>
+<p>أشجار.</p>
+<p>ناس.</p>
+<p>قرى كاملة.</p>
+<p>كل حاجة في طريقها بتتسحق تحت جدار مائي متحرك.</p>
+<p>سواحل جاوة وسومطرة اتضربت بشراسة.</p>
+<p>قرى اختفت.</p>
+<p>مدن ساحلية اتدمرت.</p>
+<p>سفن اتقذفت جوه اليابسة.</p>
+<p>والناس اللي كانوا على الساحل، ماكانش عندهم وقت يفهموا اللي بيحصل.</p>
+<p>النتيجة كانت كارثية:</p>
+<p>حوالي 36 ألف شخص فقدوا حياتهم.</p>
+<p>والأهم…</p>
+<p>إن معظمهم ما ماتوش بسبب الحمم.</p>
+<p><strong>ماتوا بسبب التسونامي.</strong></p>
+<p>ودي واحدة من أهم النقط في الفيديو كله:</p>
+<p>مش دايمًا أخطر حاجة في البركان هي النار.</p>
+<p>أحيانًا البركان بيقتل بالبحر.</p>
+<p>أحيانًا بيقتل بالرماد.</p>
+<p>أحيانًا بيقتل بالغاز.</p>
+<p>وأحيانًا بيغير المناخ نفسه.</p>
+<p>وقتها إندونيسيا ماكانتش دولة مستقلة بالشكل اللي نعرفه النهارده.</p>
+<p>المنطقة كانت تحت سيطرة الاستعمار الهولندي، أو ما كان يُعرف بجزر الهند الشرقية الهولندية.</p>
+<p>بعد الكارثة، السلطات بدأت تحصر الدمار.</p>
+<p>قرى كاملة اختفت.</p>
+<p>سواحل اتغير شكلها.</p>
+<p>آلاف الجثث.</p>
+<p>وسكان مشردين من غير بيوت، ولا أكل، ولا مياه نظيفة.</p>
+<p>لكن وسط الدمار ده، حصلت حاجة مهمة جدًا.</p>
+<p>الحكومة الهولندية كلفت عالم جيولوجيا اسمه روجير فيربيك إنه يدرس الكارثة.</p>
+<p>فيربيك نزل المناطق المتضررة.</p>
+<p>جمع شهادات الناس.</p>
+<p>قاس طبقات الرماد.</p>
+<p>درس اتجاهات الموجات.</p>
+<p>وحاول يفهم إزاي الكارثة دي حصلت.</p>
+<p>والنتيجة كانت تقرير ضخم عن كراكاتوا،</p>
+<p>بقى من أهم المراجع في فهم البراكين والكوارث الطبيعية.</p>
+<p>يعني من قلب الكارثة…</p>
+<p>بدأ البشر يبصوا للبركان مش كأسطورة أو غضب غامض،</p>
+<p>لكن كظاهرة علمية ممكن نفهمها ونقيسها.</p>
+<p>لكن تأثير كراكاتوا ماوقفش عند إندونيسيا.</p>
+<p>الرماد والغازات طلعوا لطبقات عالية جدًا في الجو.</p>
+<p>وسافروا حوالين العالم.</p>
+<p>والناس في بلاد بعيدة بدأت تشوف غروب شمس غريب…</p>
+<p>أحمر…</p>
+<p>دموي…</p>
+<p>كأن السماء نفسها لسه فاكرة الانفجار.</p>
+<p>درجات الحرارة عالميًا اتأثرت لفترة.</p>
+<p>والكوكب كله حس إن في مكان بعيد حصلت كارثة مش عادية.</p>
+<p>كراكاتوا علّم البشر درس مرعب:</p>
+<p>مش لازم تموت من النار علشان تكون ضحية بركان.</p>
+<p>أغلب ضحايا كراكاتوا ماتوا بسبب البحر.</p>
+<p>بسبب تسونامي البركان هو اللي سببه.</p>
+<p>وده خلّى العلماء يفهموا إن خطر البركان مش في الفوهة بس.</p>
+<p>الخطر ممكن ييجي من البحر.</p>
+<p>من الرماد.</p>
+<p>من الغاز.</p>
+<p>من الانهيارات.</p>
+<p>ومن موجة ضغط تلف حوالين الأرض.</p>
+<p>كراكاتوا كان كارثة مركبة.</p>
+<p>انفجار.</p>
+<p>انهيار.</p>
+<p>تسونامي.</p>
+<p>رماد.</p>
+<p>وصوت لف العالم.</p>
+<p>لو تامبورا سرق الصيف…</p>
+<p>فكراكاتوا خلّى الأرض تصرخ بصوت سمعه الكوكب.</p>
+<p>والسؤال هنا:</p>
+<p>إيه الأرعب في رأيك؟</p>
+<p>بركان يغيّر مناخ العالم…</p>
+<p>ولا بركان يحوّل البحر نفسه لسلاح؟</p>
+<h3 id="section-transition-vesuvius" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">انتقال إلى فيزوف</h3>
+<p>بس في بركان تالت…</p>
+<p>مش مشهور لأنه غيّر المناخ زي تامبورا.</p>
+<p>ولا لأنه صوته لف العالم زي كراكاتوا.</p>
+<p>هو مشهور لأنه عمل حاجة مرعبة وغريبة في نفس الوقت.</p>
+<p>دفن مدينة كاملة…</p>
+<p>وخلاها محفوظة تحت الرماد آلاف السنين.</p>
+<p>مدينة كانت عايشة…</p>
+<p>وفجأة الزمن وقف فيها.</p>
+<p>وده بركان فيزوف.</p>
+<h3 id="section-vesuvius" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">الجزء الثالث: فيزوف — المدينة اللي نامت تحت الرماد</h3>
+<p>سنة 79 ميلاديًا.</p>
+<p>في جنوب إيطاليا، قريب من خليج نابولي،</p>
+<p>كانت فيه مدينة رومانية اسمها بومبي.</p>
+<p>مدينة حقيقية…</p>
+<p>مش مجرد اسم في كتاب تاريخ.</p>
+<p>ناس بتصحى تشتغل.</p>
+<p>تجار في الأسواق.</p>
+<p>أطفال في الشوارع.</p>
+<p>بيوت، مطاعم، حمامات عامة، رسومات على الحيطان.</p>
+<p>حياة كاملة ماشية بشكل طبيعي.</p>
+<p>وقريب منها كانت مدينة تانية اسمها هيركولانيوم.</p>
+<p>والمدينتين دول كانوا عايشين تحت ظل جبل اسمه فيزوف.</p>
+<p>بس بالنسبة لهم، الجبل ده كان مجرد جزء من المنظر.</p>
+<p>جبل ساكت.</p>
+<p>أرض خصبة.</p>
+<p>مكان مناسب للزراعة والحياة.</p>
+<p>محدش كان متخيل إن الجبل الهادي ده…</p>
+<p>شايل جوه منه نهاية مدن كاملة.</p>
+<p>قبل الانفجار، حصلت علامات.</p>
+<p>زلازل صغيرة.</p>
+<p>اهتزازات.</p>
+<p>تغيرات غريبة.</p>
+<p>لكن في العصر ده، الناس ماكانتش فاهمة البراكين زي دلوقتي.</p>
+<p>الزلازل بتحصل…</p>
+<p>والناس بتكمل حياتها.</p>
+<p>لحد ما في يوم…</p>
+<p><strong>فيزوف انفجر.</strong></p>
+<p>في البداية، عمود ضخم من الرماد والحجارة الخفيفة طلع للسماء.</p>
+<p>السماء اسودت.</p>
+<p>والرماد بدأ ينزل على بومبي.</p>
+<p>مش شوية تراب.</p>
+<p>ده مطر من رماد وحجارة بركانية.</p>
+<p>الساعات عدت.</p>
+<p>والرماد فضل ينزل.</p>
+<p>الأسقف بدأت تستحمل فوق طاقتها.</p>
+<p>بيوت وقعت.</p>
+<p>ناس حاولت تهرب.</p>
+<p>ناس استخبت.</p>
+<p>وناس افتكرت إن العاصفة هتعدي.</p>
+<p>بس اللي جاي كان أسوأ.</p>
+<p>بعد مرحلة الرماد، حصلت المرحلة القاتلة:</p>
+<p>سحب نارية من الغاز والرماد اندفعت من الجبل بسرعة رهيبة.</p>
+<p>السحب دي اسمها علميًا تيارات بركانية حارة…</p>
+<p>بس بالبلدي:</p>
+<p><strong>دي عاصفة موت.</strong></p>
+<p>غاز.</p>
+<p>رماد.</p>
+<p>صخور دقيقة.</p>
+<p>حرارة قاتلة.</p>
+<p>وسرعة مرعبة.</p>
+<p>هيركولانيوم اتدفنت تحت طبقات ضخمة من المواد البركانية.</p>
+<p>وبومبي اتغطت بالرماد.</p>
+<p>في لحظة، المدن اللي كانت مليانة حياة…</p>
+<p>بقت مدن ساكتة.</p>
+<p>وفيه صورة مشهورة جدًا عن بومبي:</p>
+<p>إن الناس ماتت وهي بتجري من أنهار حمم نارية.</p>
+<p>بس الحقيقة إن ده مش اللي حصل.</p>
+<p>فيزوف ماكانش خطره الأساسي في اللافا السائلة.</p>
+<p>الخطر الحقيقي كان في السحب البركانية الحارة.</p>
+<p>ناس كتير ماكانش عندها فرصة حقيقية.</p>
+<p>اللي فضل في مكانه…</p>
+<p>أو استخبى جوه بيت…</p>
+<p>أو افتكر إن العاصفة هتعدي…</p>
+<p>اكتشف بعد فوات الأوان إن اللي جاي مش مجرد رماد.</p>
+<p>اللي جاي كان هواء قاتل.</p>
+<p>وده يغير الصورة اللي في دماغنا عن البراكين.</p>
+<p>مش كل بركان بيقتل بالحمم.</p>
+<p>أحيانًا أخطر حاجة في البركان…</p>
+<p>هي الحاجة اللي مش هتعرف تهرب منها:</p>
+<p>الهواء نفسه.</p>
+<p>لكن وسط الفوضى دي، حصلت واحدة من أقدم محاولات الإنقاذ الموثقة في التاريخ.</p>
+<p>كان فيه قائد روماني وعالم طبيعة اسمه بليني الأكبر.</p>
+<p>كان قائد الأسطول الروماني في منطقة قريبة اسمها ميسينوم.</p>
+<p>لما شاف عمود الدخان الضخم طالع من فيزوف،</p>
+<p>في البداية اهتمامه العلمي اتشد.</p>
+<p>لكن لما وصلتله رسالة استغاثة من ناس محاصرين،</p>
+<p>قرر يتحرك بسفن الأسطول علشان ينقذهم.</p>
+<p>تخيل المشهد:</p>
+<p>بحر مضطرب.</p>
+<p>سماء سودا.</p>
+<p>رماد نازل.</p>
+<p>وجبل بينفجر.</p>
+<p>ومع ذلك، الأسطول بيحاول يقرب من منطقة الخطر.</p>
+<p>لكن الظروف كانت أقوى من أي إنسان.</p>
+<p>الرياح، الرماد، والغازات السامة خلت مهمة الإنقاذ شبه مستحيلة.</p>
+<p>وبليني الأكبر نفسه مات خلال المحاولة.</p>
+<p>القصة دي مهمة…</p>
+<p>لأنها بتورينا إن حتى في العصور القديمة،</p>
+<p>كان فيه ناس بتحاول تفهم الكارثة…</p>
+<p>وناس بتحاول تنقذ غيرها…</p>
+<p>حتى لو الثمن كان حياتها.</p>
+<p>وبعد الكارثة، بومبي وهيركولانيوم اختفوا.</p>
+<p>البيوت فضلت موجودة.</p>
+<p>الشوارع فضلت موجودة.</p>
+<p>الأواني، الرسومات، الجدران، المحلات…</p>
+<p>كل حاجة اتدفنت.</p>
+<p>وكأن الزمن وقف.</p>
+<p>والغريب إن الدمار ده، رغم بشاعته،</p>
+<p>حفظ لنا تفاصيل نادرة جدًا من الحياة الرومانية.</p>
+<p>بعد قرون طويلة، لما الناس اكتشفوا بومبي من جديد،</p>
+<p>لقوا مدينة كاملة طالعة من تحت الرماد.</p>
+<p>مش أطلال عادية.</p>
+<p>دي لقطة متجمدة من يوم كارثة.</p>
+<p>لقوا بيوت.</p>
+<p>لقوا كتابات على الحيطان.</p>
+<p>لقوا أدوات أكل.</p>
+<p>لقوا أماكن شغل.</p>
+<p>ولقوا آثار ناس كانوا عايشين لحظاتهم الأخيرة.</p>
+<p>فيزوف ماكانش الأقوى في التاريخ.</p>
+<p>وماعملش كارثة مناخية عالمية زي تامبورا.</p>
+<p>وماكانش صوته مرعب زي كراكاتوا.</p>
+<p>لكن فيزوف عمل حاجة مختلفة.</p>
+<p>خلّى البشر يشوفوا الموت وهو بيحفظ الحياة.</p>
+<p>دفن مدينة…</p>
+<p>لكن في نفس الوقت، حفظها من النسيان.</p>
+<p>بومبي بقت درس.</p>
+<p>درس إن الحضارات مهما كانت قوية،</p>
+<p>ومهما كانت المدن مزدهرة،</p>
+<p>ومهما كانت الحياة ماشية عادي…</p>
+<p>في لحظة واحدة،</p>
+<p>الطبيعة ممكن توقف كل حاجة.</p>
+<p>مدينة كاملة كانت بتتنفس…</p>
+<p>نامت تحت الرماد.</p>
+<p>ولما صحيناها بعد آلاف السنين…</p>
+<p>لقيناها لسه بتحكي.</p>
+<h3 id="section-conclusion" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">الربط النهائي والخاتمة</h3>
+<p>لو ركزت في التلات براكين دول،</p>
+<p>هتلاقي إن كل واحد فيهم غير التاريخ بطريقة مختلفة.</p>
+<p>تامبورا ماكانش محتاج يدمر مدن كتير قدامه.</p>
+<p>هو طلع للسماء…</p>
+<p>ومن هناك غيّر المناخ.</p>
+<p>كراكاتوا ماقتلش أغلب ضحاياه بالنار.</p>
+<p>قتلهم بالبحر.</p>
+<p>وفيزوف ماكانش الأكبر ولا الأعلى صوتًا.</p>
+<p>لكنه جمّد لحظة كاملة من حياة مدينة تحت الرماد.</p>
+<p>وده يخلينا نسأل سؤال مهم:</p>
+<p>إحنا لما بنقول كارثة بركانية…</p>
+<p>هل إحنا فعلًا فاهمين يعني إيه بركان؟</p>
+<p>ولا لسه بنتخيلها مجرد حمم نار ماشية على الأرض؟</p>
+<p>الحقيقة إن البركان ممكن يكون نار.</p>
+<p>وممكن يكون موجة.</p>
+<p>وممكن يكون رماد.</p>
+<p>وممكن يكون غاز.</p>
+<p>وممكن يكون شتاء كامل يغطي العالم.</p>
+<p>في النهاية…</p>
+<p>البراكين دي مش مجرد أحداث قديمة بنحكيها علشان نندهش.</p>
+<p>دي رسائل.</p>
+<p>تامبورا بيقولك إن تغير المناخ ممكن يبدأ من انفجار واحد.</p>
+<p>كراكاتوا بيقولك إن البحر ممكن يتحول في لحظة لسلاح.</p>
+<p>وفيزوف بيقولك إن مدينة كاملة ممكن تنام تحت الرماد…</p>
+<p>وتصحى بعد ألفين سنة علشان تحكي قصتها.</p>
+<p>إحنا عايشين على قشرة رقيقة فوق كوكب مليان نار وضغط وحركة.</p>
+<p>والأرض طول الوقت ساكتة…</p>
+<p>بس سكوتها مش معناه إنها نايمة.</p>
+<p>أحيانًا بتفضل سنين وقرون هادية…</p>
+<p>وبعدين في لحظة واحدة،</p>
+<p>تتكلم.</p>
+<p>وساعتها…</p>
+<p>كلامها مش بيكون صوت عادي.</p>
+<p>بيكون رماد في السماء.</p>
+<p>موجة في البحر.</p>
+<p>برد في الصيف.</p>
+<p>ومدينة كاملة واقفة مكانها…</p>
+<p>كأن الزمن نسي يعدي عليها.</p>
+<p>ولو وصلت لحد هنا، اكتبلي في التعليقات:</p>
+<p>إيه أكتر بركان من التلاتة حسيت إنه كان مرعب فعلًا؟</p>
+<p>تامبورا اللي سرق الصيف؟</p>
+<p>كراكاتوا اللي قتل بالبحر؟</p>
+<p>ولا فيزوف اللي دفن مدينة كاملة؟</p>
+<p>والسؤال الحقيقي مش:</p>
+<p>هل البراكين دي ممكن تتكرر؟</p>
+<p>السؤال هو:</p>
+<p>لو الأرض قررت تتكلم تاني…</p>
+<p>هل إحنا مستعدين نسمع؟</p>
+<h3 id="section-note" class="text-xl font-bold text-volcano-500 mt-10 mb-4 border-b border-slate-700 pb-3">ملاحظة تحقق سريعة</h3>
+<p>الأرقام الأساسية في السكريبت مبنية على تقديرات تاريخية وعلمية، لذلك استخدمت صياغات زي “حوالي” و“في بعض التقديرات” حفاظًا على الدقة.</p>
+<p>تامبورا 1815 ارتبط بتأثيرات مناخية عالمية و“سنة بلا صيف”.</p>
+<p>كراكاتوا 1883 تسبب في تسونامي ووفيات تُقدّر بحوالي 36 ألف.</p>
+<p>فيزوف 79م دفن بومبي وهيركولانيوم.</p>
+        </div>
+    </div>
+</main>
+<footer class="glass-panel border-t border-slate-700 py-4 mt-auto">
+    <div class="max-w-4xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-slate-400">
+        <span id="scriptStats">جاري حساب الإحصائيات...</span>
+        <span>النسخة الطويلة الفايرال — Retention Edited</span>
+    </div>
+</footer>
+<div id="toast" role="status" aria-live="polite" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 bg-volcano-600 text-white text-sm rounded-lg shadow-xl flex items-center gap-2 pointer-events-none">
+    <i class="fa-solid fa-circle-check"></i><span id="toastMessage"></span>
+</div>
+<script>
+const rawText = "3 براكين غيروا التاريخ… والحمم ماكانتْش أخطر حاجة\n\nفي بركان قتل الناس بالبحر…\n\nوبركان تاني سرق الصيف من الكوكب كله…\n\nوبركان تالت دفن مدينة كاملة…\nوخلى الزمن كأنه وقف عندها ألفين سنة.\n\nوالأغرب؟\nإن أخطر حاجة في التلات براكين دول ماكانتْش الحمم.\n\nالنهارده هنتكلم عن 3 جبال غيروا تاريخ البشرية.\n\nتامبورا…\nالبركان اللي خلّى العالم يدخل سنة بلا صيف.\n\nكراكاتوا…\nالبركان اللي صوته اتسمع على بعد آلاف الكيلومترات.\n\nوفيزوف…\nالبركان اللي دفن بومبي، وحوّل مدينة كاملة لصورة متجمدة من الماضي.\n\nبس قبل ما نبدأ…\nلازم تعرف إن البركان مش دايمًا بيقتل بالنار.\n\nأحيانًا بيقتل بالبحر.\nوأحيانًا بالجوع.\nوأحيانًا بيقتل مدينة…\nويحفظ حكايتها في نفس الوقت.\n\n--- الجزء الأول: تامبورا — البركان اللي سرق الصيف ---\n\nأول بركان معانا هو تامبورا.\n\nولو هنتكلم عن بركان غيّر العالم بجد…\nفلازم نبدأ بيه.\n\nسنة 1815، في جزيرة اسمها سومباوا في إندونيسيا،\nكان فيه جبل ضخم اسمه تامبورا.\n\nالجبل ده قبل الانفجار كان ارتفاعه حوالي 4300 متر.\n\nيعني جبل عملاق…\nساكت…\nثابت…\nوكأنه جزء عادي من الطبيعة.\n\nبس الهدوء ده كان خدعة.\n\nجوه الجبل، كان فيه ضغط بيتراكم سنة ورا سنة.\nصهارة، غازات، وحرارة محبوسة تحت الأرض.\n\nوكل ما الضغط يزيد…\nالجبل كان بيقرب أكتر من لحظة الانفجار.\n\nوفي أبريل سنة 1815…\nالأرض ماقدرتش تستحمل أكتر.\n\nتامبورا انفجر.\n\nمش انفجار عادي.\nده كان واحد من أضخم الانفجارات البركانية اللي البشر سجلوها في التاريخ.\n\nالانفجار كان عنيف لدرجة إن جزء كبير من الجبل نفسه اختفى.\n\nتخيل جبل ارتفاعه آلاف الأمتار…\nوفي لحظات، يفقد جزء ضخم من جسمه،\nويتحول لفوهة عملاقة.\n\nالرماد طلع لارتفاع مرعب في السماء.\nوالقرى القريبة من البركان اتحولت لجحيم.\n\nفي ناس ماتت فورًا بسبب السحب النارية والرماد والمواد البركانية اللي نزلت من الجبل بسرعة وحرارة قاتلة.\n\nبس دي ماكنتش الكارثة الأكبر.\n\nودي أول مفاجأة في قصة تامبورا:\n\nالبركان ده ما قتلش بس الناس اللي كانوا جنبه.\nتامبورا قتل ناس عمرهم ما شافوه.\n\nإزاي؟\n\nعن طريق السماء.\n\nبعد الانفجار، كميات ضخمة من الرماد والغازات طلعت لطبقات عالية جدًا في الجو.\nوالغازات دي عملت شبه ستارة حوالين الأرض.\n\nستارة حجبت جزء من ضوء الشمس.\n\nوالنتيجة؟\n\nالسنة اللي بعدها، سنة 1816، اتعرفت باسم:\nسنة بلا صيف.\n\nتخيل معايا…\n\nإحنا في شهر يونيو.\nالمفروض شمس، حر، زرع، وحصاد.\n\nلكن بدل ده…\nبرد غريب.\nتلج في أماكن المفروض تكون في عز الصيف.\nمحاصيل بتتجمد وتموت.\nمواشي مش لاقية أكل.\nوناس بتصحى تلاقي موسم الزراعة كله انتهى قبل ما يبدأ.\n\nفي أوروبا وأمريكا الشمالية، المحاصيل فشلت.\nأسعار الأكل زادت.\nالمجاعات انتشرت.\nوالناس بدأت تعاني من الجوع والمرض.\n\nيعني بركان في جزيرة بعيدة…\nخلّى ناس في بلاد تانية تبرد وتجوع وتمرض…\nمن غير ما يكونوا حتى عارفين اسمه.\n\nوالأغرب؟\nإن الناس وقتها ماكانتش فاهمة إن السبب الحقيقي هو بركان.\n\nفي ناس قالت دي علامات غضب إلهي.\nوناس ربطت الموضوع بالمذنبات.\nوناس افتكرت إن الشمس نفسها حصلها حاجة.\n\nوده مفهوم…\nلأن العلم وقتها ماكانش لسه فاهم العلاقة بين البراكين والمناخ.\n\nمحدش كان متخيل إن جبل في إندونيسيا…\nممكن يغير طقس العالم كله.\n\nوقتها المنطقة كانت تحت إدارة بريطانية مؤقتة،\nوالحاكم توماس ستامفورد رافلز كان موجود في باتافيا، اللي هي جاكرتا حاليًا.\n\nلما صوت الانفجارات اتسمع،\nفي البداية افتكروه مدافع أو هجوم بحري.\n\nتخيل قوة الصوت كانت عاملة إزاي…\nلدرجة إن السلطة نفسها افتكرت إن فيه حرب.\n\nلكن بعد ما الرماد بدأ ينتشر،\nوالتقارير بدأت توصل،\nاتضح إن اللي حصل مش هجوم…\nدي كارثة طبيعية ضخمة.\n\nاتبعث مسؤولين يشوفوا اللي حصل في سومباوا.\n\nواللي اتسجل وقتها كان مرعب:\n\nقرى مختفية.\nجثث في الطرق.\nمياه ملوثة.\nمحاصيل مدفونة تحت الرماد.\nوناس نجت من الانفجار…\nلكنها بدأت تموت بعده من الجوع والمرض.\n\nوهنا لازم نقف عند درس مهم:\n\nأحيانًا الضربة الأولى في الكارثة مش هي الأخطر.\n\nالانفجار بيقتل في لحظة…\nلكن اللي بعده ممكن يقتل لشهور وسنين.\n\nتامبورا علم البشر إن الكوكب كله متوصل ببعضه.\n\nكارثة تحصل في جزيرة بعيدة،\nممكن تغيّر الجو في قارة تانية،\nوتبوّظ الزراعة في بلد تالتة،\nوتسبب جوع ومرض في أماكن عمرها ما شافت البركان.\n\nتامبورا ماكنش مجرد جبل انفجر.\n\nتامبورا كان بركان طلع للسماء…\nومن هناك، غيّر مصير البشر.\n\nتامبورا ببساطة…\nسرق الصيف من العالم.\n\nودلوقتي تخيل لو كارثة زي دي حصلت في عصرنا الحالي…\nوالعالم كله معتمد على الإنترنت، الشحن، الزراعة الحديثة، وسلاسل الإمداد.\n\nتفتكر أول حاجة هتنهار؟\n\nالأكل؟\nالكهربا؟\nولا الاقتصاد؟\n\nاكتبلي رأيك في التعليقات…\nلأن إجابة السؤال ده مرعبة أكتر مما نتخيل.\n\n--- انتقال إلى كراكاتوا ---\n\nبس لو تامبورا كان البركان اللي خلّى العالم يبرد…\n\nفالبركان اللي جاي عمل حاجة أغرب.\n\nبركان صرخ…\nوالكوكب سمعه.\n\nصوته اتسمع على بعد آلاف الكيلومترات.\nوانفجاره حرّك البحر نفسه.\n\nوده ياخدنا لكراكاتوا.\n\n--- الجزء الثاني: كراكاتوا — لما الأرض صرخت ---\n\nسنة 1883.\n\nفي مضيق سوندا، بين جزيرتي جاوة وسومطرة في إندونيسيا الحالية،\nكان فيه جزيرة بركانية اسمها كراكاتوا.\n\nجزيرة في النص بين البحر والنار.\n\nمن بره، شكلها عادي.\nلكن من جوه…\nالأرض كانت بتغلي.\n\nمن شهر مايو في نفس السنة،\nالسفن اللي كانت معدية في المنطقة بدأت تلاحظ حاجات غريبة.\n\nدخان طالع من الجزيرة.\nرماد في الجو.\nانفجارات صغيرة.\nأصوات مكتومة.\n\nالمشهد كان مخيف…\nبس في نفس الوقت، فيه ناس وقتها اتعاملت معاه كأنه منظر غريب يستاهل الفرجة.\n\nوده واحد من أخطر أنواع الهدوء:\n\nلما الكارثة تبدأ تديك إشارات…\nبس الناس تفتكرها مجرد عرض طبيعي.\n\nالأيام عدت.\nوالنشاط زاد.\nوالجزيرة بدأت تبعت تحذيراتها الأخيرة.\n\nلحد ما جه يوم 27 أغسطس سنة 1883.\n\nفي الصبح…\nكراكاتوا انفجر.\n\nوالانفجار ده ماكانش مجرد انفجار بركاني.\nده كان حدث عالمي.\n\nالصوت اتسمع على بعد آلاف الكيلومترات.\n\nتخيل تبقى واقف في القاهرة…\nوتسمع بوضوح صوت انفجار حصل في باريس.\n\nمش خبر في التليفزيون.\nمش إشعار على الموبايل.\nصوت حقيقي واصل لودنك.\n\nده تقريبًا حجم الرعب اللي عمله كراكاتوا.\n\nناس في أماكن بعيدة جدًا سمعوا الدوي المرعب،\nوافتكروه مدافع أو حرب.\n\nكأن الأرض نفسها صرخت…\nوالكوكب كله سمعها.\n\nلكن المفاجأة؟\nالصوت ماكانش أخطر حاجة.\n\nالانفجار كان قوي لدرجة إن جزء كبير من الجزيرة انهار في البحر.\n\nوهنا بدأت الكارثة الحقيقية.\n\nفيه ناس بتفتكر إن كراكاتوا ببساطة “غرق”…\nكأن البحر ابتلع الجزيرة مرة واحدة.\n\nلكن الحقيقة العلمية أشرس من كده.\n\nالانفجار فرّغ جزء ضخم من حجرة الصهارة اللي تحت الجزيرة.\nيعني الأرض اللي كانت شايلة الجزيرة من تحت…\nبقت فاضية فجأة.\n\nفلما الدعم اختفى،\nجزء كبير من الجزيرة انهار لجوه،\nزي سقف بيت يقع لما العواميد اللي شايلينه تتكسر.\n\nبس الانهيار ده حصل فين؟\n\nفي البحر.\n\nوهنا البحر اتحول لسلاح.\n\nالمياه اندفعت بعنف،\nواتولدت موجات تسونامي ضخمة.\n\nمش موجة عادية.\n\nفي بعض التقديرات، ارتفاع الموجة وصل لحوالي 40 متر.\n\nيعني تخيل جدار مياه قد عمارة من 13 دور…\nمش واقف مكانه…\nده بيتحرك ناحية الساحل بسرعة وقوة تكفي تشيل بيوت، مراكب، أشجار، وناس في ثواني.\n\nوالموجة دي ما بتخبطش وبس.\nدي بتمسح.\n\nبيوت.\nمراكب.\nأشجار.\nناس.\nقرى كاملة.\n\nكل حاجة في طريقها بتتسحق تحت جدار مائي متحرك.\n\nسواحل جاوة وسومطرة اتضربت بشراسة.\nقرى اختفت.\nمدن ساحلية اتدمرت.\nسفن اتقذفت جوه اليابسة.\nوالناس اللي كانوا على الساحل، ماكانش عندهم وقت يفهموا اللي بيحصل.\n\nالنتيجة كانت كارثية:\n\nحوالي 36 ألف شخص فقدوا حياتهم.\n\nوالأهم…\nإن معظمهم ما ماتوش بسبب الحمم.\n\nماتوا بسبب التسونامي.\n\nودي واحدة من أهم النقط في الفيديو كله:\n\nمش دايمًا أخطر حاجة في البركان هي النار.\n\nأحيانًا البركان بيقتل بالبحر.\nأحيانًا بيقتل بالرماد.\nأحيانًا بيقتل بالغاز.\nوأحيانًا بيغير المناخ نفسه.\n\nوقتها إندونيسيا ماكانتش دولة مستقلة بالشكل اللي نعرفه النهارده.\nالمنطقة كانت تحت سيطرة الاستعمار الهولندي، أو ما كان يُعرف بجزر الهند الشرقية الهولندية.\n\nبعد الكارثة، السلطات بدأت تحصر الدمار.\n\nقرى كاملة اختفت.\nسواحل اتغير شكلها.\nآلاف الجثث.\nوسكان مشردين من غير بيوت، ولا أكل، ولا مياه نظيفة.\n\nلكن وسط الدمار ده، حصلت حاجة مهمة جدًا.\n\nالحكومة الهولندية كلفت عالم جيولوجيا اسمه روجير فيربيك إنه يدرس الكارثة.\n\nفيربيك نزل المناطق المتضررة.\nجمع شهادات الناس.\nقاس طبقات الرماد.\nدرس اتجاهات الموجات.\nوحاول يفهم إزاي الكارثة دي حصلت.\n\nوالنتيجة كانت تقرير ضخم عن كراكاتوا،\nبقى من أهم المراجع في فهم البراكين والكوارث الطبيعية.\n\nيعني من قلب الكارثة…\nبدأ البشر يبصوا للبركان مش كأسطورة أو غضب غامض،\nلكن كظاهرة علمية ممكن نفهمها ونقيسها.\n\nلكن تأثير كراكاتوا ماوقفش عند إندونيسيا.\n\nالرماد والغازات طلعوا لطبقات عالية جدًا في الجو.\nوسافروا حوالين العالم.\n\nوالناس في بلاد بعيدة بدأت تشوف غروب شمس غريب…\n\nأحمر…\nدموي…\nكأن السماء نفسها لسه فاكرة الانفجار.\n\nدرجات الحرارة عالميًا اتأثرت لفترة.\nوالكوكب كله حس إن في مكان بعيد حصلت كارثة مش عادية.\n\nكراكاتوا علّم البشر درس مرعب:\n\nمش لازم تموت من النار علشان تكون ضحية بركان.\n\nأغلب ضحايا كراكاتوا ماتوا بسبب البحر.\nبسبب تسونامي البركان هو اللي سببه.\n\nوده خلّى العلماء يفهموا إن خطر البركان مش في الفوهة بس.\n\nالخطر ممكن ييجي من البحر.\nمن الرماد.\nمن الغاز.\nمن الانهيارات.\nومن موجة ضغط تلف حوالين الأرض.\n\nكراكاتوا كان كارثة مركبة.\n\nانفجار.\nانهيار.\nتسونامي.\nرماد.\nوصوت لف العالم.\n\nلو تامبورا سرق الصيف…\nفكراكاتوا خلّى الأرض تصرخ بصوت سمعه الكوكب.\n\nوالسؤال هنا:\n\nإيه الأرعب في رأيك؟\nبركان يغيّر مناخ العالم…\nولا بركان يحوّل البحر نفسه لسلاح؟\n\n--- انتقال إلى فيزوف ---\n\nبس في بركان تالت…\nمش مشهور لأنه غيّر المناخ زي تامبورا.\n\nولا لأنه صوته لف العالم زي كراكاتوا.\n\nهو مشهور لأنه عمل حاجة مرعبة وغريبة في نفس الوقت.\n\nدفن مدينة كاملة…\nوخلاها محفوظة تحت الرماد آلاف السنين.\n\nمدينة كانت عايشة…\nوفجأة الزمن وقف فيها.\n\nوده بركان فيزوف.\n\n--- الجزء الثالث: فيزوف — المدينة اللي نامت تحت الرماد ---\n\nسنة 79 ميلاديًا.\n\nفي جنوب إيطاليا، قريب من خليج نابولي،\nكانت فيه مدينة رومانية اسمها بومبي.\n\nمدينة حقيقية…\nمش مجرد اسم في كتاب تاريخ.\n\nناس بتصحى تشتغل.\nتجار في الأسواق.\nأطفال في الشوارع.\nبيوت، مطاعم، حمامات عامة، رسومات على الحيطان.\n\nحياة كاملة ماشية بشكل طبيعي.\n\nوقريب منها كانت مدينة تانية اسمها هيركولانيوم.\n\nوالمدينتين دول كانوا عايشين تحت ظل جبل اسمه فيزوف.\n\nبس بالنسبة لهم، الجبل ده كان مجرد جزء من المنظر.\n\nجبل ساكت.\nأرض خصبة.\nمكان مناسب للزراعة والحياة.\n\nمحدش كان متخيل إن الجبل الهادي ده…\nشايل جوه منه نهاية مدن كاملة.\n\nقبل الانفجار، حصلت علامات.\n\nزلازل صغيرة.\nاهتزازات.\nتغيرات غريبة.\n\nلكن في العصر ده، الناس ماكانتش فاهمة البراكين زي دلوقتي.\n\nالزلازل بتحصل…\nوالناس بتكمل حياتها.\n\nلحد ما في يوم…\nفيزوف انفجر.\n\nفي البداية، عمود ضخم من الرماد والحجارة الخفيفة طلع للسماء.\nالسماء اسودت.\nوالرماد بدأ ينزل على بومبي.\n\nمش شوية تراب.\n\nده مطر من رماد وحجارة بركانية.\n\nالساعات عدت.\nوالرماد فضل ينزل.\n\nالأسقف بدأت تستحمل فوق طاقتها.\nبيوت وقعت.\nناس حاولت تهرب.\nناس استخبت.\nوناس افتكرت إن العاصفة هتعدي.\n\nبس اللي جاي كان أسوأ.\n\nبعد مرحلة الرماد، حصلت المرحلة القاتلة:\n\nسحب نارية من الغاز والرماد اندفعت من الجبل بسرعة رهيبة.\n\nالسحب دي اسمها علميًا تيارات بركانية حارة…\nبس بالبلدي:\n\nدي عاصفة موت.\n\nغاز.\nرماد.\nصخور دقيقة.\nحرارة قاتلة.\nوسرعة مرعبة.\n\nهيركولانيوم اتدفنت تحت طبقات ضخمة من المواد البركانية.\nوبومبي اتغطت بالرماد.\n\nفي لحظة، المدن اللي كانت مليانة حياة…\nبقت مدن ساكتة.\n\nوفيه صورة مشهورة جدًا عن بومبي:\nإن الناس ماتت وهي بتجري من أنهار حمم نارية.\n\nبس الحقيقة إن ده مش اللي حصل.\n\nفيزوف ماكانش خطره الأساسي في اللافا السائلة.\n\nالخطر الحقيقي كان في السحب البركانية الحارة.\n\nناس كتير ماكانش عندها فرصة حقيقية.\nاللي فضل في مكانه…\nأو استخبى جوه بيت…\nأو افتكر إن العاصفة هتعدي…\n\nاكتشف بعد فوات الأوان إن اللي جاي مش مجرد رماد.\n\nاللي جاي كان هواء قاتل.\n\nوده يغير الصورة اللي في دماغنا عن البراكين.\n\nمش كل بركان بيقتل بالحمم.\nأحيانًا أخطر حاجة في البركان…\nهي الحاجة اللي مش هتعرف تهرب منها:\n\nالهواء نفسه.\n\nلكن وسط الفوضى دي، حصلت واحدة من أقدم محاولات الإنقاذ الموثقة في التاريخ.\n\nكان فيه قائد روماني وعالم طبيعة اسمه بليني الأكبر.\nكان قائد الأسطول الروماني في منطقة قريبة اسمها ميسينوم.\n\nلما شاف عمود الدخان الضخم طالع من فيزوف،\nفي البداية اهتمامه العلمي اتشد.\n\nلكن لما وصلتله رسالة استغاثة من ناس محاصرين،\nقرر يتحرك بسفن الأسطول علشان ينقذهم.\n\nتخيل المشهد:\n\nبحر مضطرب.\nسماء سودا.\nرماد نازل.\nوجبل بينفجر.\n\nومع ذلك، الأسطول بيحاول يقرب من منطقة الخطر.\n\nلكن الظروف كانت أقوى من أي إنسان.\n\nالرياح، الرماد، والغازات السامة خلت مهمة الإنقاذ شبه مستحيلة.\nوبليني الأكبر نفسه مات خلال المحاولة.\n\nالقصة دي مهمة…\nلأنها بتورينا إن حتى في العصور القديمة،\nكان فيه ناس بتحاول تفهم الكارثة…\nوناس بتحاول تنقذ غيرها…\nحتى لو الثمن كان حياتها.\n\nوبعد الكارثة، بومبي وهيركولانيوم اختفوا.\n\nالبيوت فضلت موجودة.\nالشوارع فضلت موجودة.\nالأواني، الرسومات، الجدران، المحلات…\nكل حاجة اتدفنت.\n\nوكأن الزمن وقف.\n\nوالغريب إن الدمار ده، رغم بشاعته،\nحفظ لنا تفاصيل نادرة جدًا من الحياة الرومانية.\n\nبعد قرون طويلة، لما الناس اكتشفوا بومبي من جديد،\nلقوا مدينة كاملة طالعة من تحت الرماد.\n\nمش أطلال عادية.\n\nدي لقطة متجمدة من يوم كارثة.\n\nلقوا بيوت.\nلقوا كتابات على الحيطان.\nلقوا أدوات أكل.\nلقوا أماكن شغل.\nولقوا آثار ناس كانوا عايشين لحظاتهم الأخيرة.\n\nفيزوف ماكانش الأقوى في التاريخ.\nوماعملش كارثة مناخية عالمية زي تامبورا.\nوماكانش صوته مرعب زي كراكاتوا.\n\nلكن فيزوف عمل حاجة مختلفة.\n\nخلّى البشر يشوفوا الموت وهو بيحفظ الحياة.\n\nدفن مدينة…\nلكن في نفس الوقت، حفظها من النسيان.\n\nبومبي بقت درس.\n\nدرس إن الحضارات مهما كانت قوية،\nومهما كانت المدن مزدهرة،\nومهما كانت الحياة ماشية عادي…\n\nفي لحظة واحدة،\nالطبيعة ممكن توقف كل حاجة.\n\nمدينة كاملة كانت بتتنفس…\nنامت تحت الرماد.\n\nولما صحيناها بعد آلاف السنين…\nلقيناها لسه بتحكي.\n\n--- الربط النهائي والخاتمة ---\n\nلو ركزت في التلات براكين دول،\nهتلاقي إن كل واحد فيهم غير التاريخ بطريقة مختلفة.\n\nتامبورا ماكانش محتاج يدمر مدن كتير قدامه.\nهو طلع للسماء…\nومن هناك غيّر المناخ.\n\nكراكاتوا ماقتلش أغلب ضحاياه بالنار.\nقتلهم بالبحر.\n\nوفيزوف ماكانش الأكبر ولا الأعلى صوتًا.\nلكنه جمّد لحظة كاملة من حياة مدينة تحت الرماد.\n\nوده يخلينا نسأل سؤال مهم:\n\nإحنا لما بنقول كارثة بركانية…\nهل إحنا فعلًا فاهمين يعني إيه بركان؟\n\nولا لسه بنتخيلها مجرد حمم نار ماشية على الأرض؟\n\nالحقيقة إن البركان ممكن يكون نار.\nوممكن يكون موجة.\nوممكن يكون رماد.\nوممكن يكون غاز.\nوممكن يكون شتاء كامل يغطي العالم.\n\nفي النهاية…\nالبراكين دي مش مجرد أحداث قديمة بنحكيها علشان نندهش.\n\nدي رسائل.\n\nتامبورا بيقولك إن تغير المناخ ممكن يبدأ من انفجار واحد.\n\nكراكاتوا بيقولك إن البحر ممكن يتحول في لحظة لسلاح.\n\nوفيزوف بيقولك إن مدينة كاملة ممكن تنام تحت الرماد…\nوتصحى بعد ألفين سنة علشان تحكي قصتها.\n\nإحنا عايشين على قشرة رقيقة فوق كوكب مليان نار وضغط وحركة.\n\nوالأرض طول الوقت ساكتة…\nبس سكوتها مش معناه إنها نايمة.\n\nأحيانًا بتفضل سنين وقرون هادية…\nوبعدين في لحظة واحدة،\nتتكلم.\n\nوساعتها…\nكلامها مش بيكون صوت عادي.\n\nبيكون رماد في السماء.\nموجة في البحر.\nبرد في الصيف.\nومدينة كاملة واقفة مكانها…\nكأن الزمن نسي يعدي عليها.\n\nولو وصلت لحد هنا، اكتبلي في التعليقات:\n\nإيه أكتر بركان من التلاتة حسيت إنه كان مرعب فعلًا؟\n\nتامبورا اللي سرق الصيف؟\nكراكاتوا اللي قتل بالبحر؟\nولا فيزوف اللي دفن مدينة كاملة؟\n\nوالسؤال الحقيقي مش:\nهل البراكين دي ممكن تتكرر؟\n\nالسؤال هو:\n\nلو الأرض قررت تتكلم تاني…\nهل إحنا مستعدين نسمع؟\n\n--- ملاحظة تحقق سريعة ---\n\nالأرقام الأساسية في السكريبت مبنية على تقديرات تاريخية وعلمية، لذلك استخدمت صياغات زي “حوالي” و“في بعض التقديرات” حفاظًا على الدقة.\nتامبورا 1815 ارتبط بتأثيرات مناخية عالمية و“سنة بلا صيف”.\nكراكاتوا 1883 تسبب في تسونامي ووفيات تُقدّر بحوالي 36 ألف.\nفيزوف 79م دفن بومبي وهيركولانيوم.";
+let toastTimer;
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMessage').textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+function downloadScript(type) {
+    let content = '', filename = '', mimeType = '';
+    if (type === 'txt') {
+        content = rawText;
+        filename = 'Long_Viral_Volcano_Script.txt';
+        mimeType = 'text/plain;charset=utf-8';
+    } else if (type === 'md') {
+        content = '# 3 براكين غيروا التاريخ… والحمم ماكانتْش أخطر حاجة\n\n' + rawText;
+        filename = 'Long_Viral_Volcano_Script.md';
+        mimeType = 'text/markdown;charset=utf-8';
+    } else if (type === 'word') {
+        const htmlBody = document.getElementById('readableScript').innerHTML;
+        content = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body{font-family:Arial,sans-serif;direction:rtl;font-size:16px;line-height:1.7}h3{color:#d9534f;border-bottom:1px solid #ccc;padding-bottom:6px}p{margin-bottom:12px}strong{font-weight:bold;color:#d9534f}</style></head><body><h1 style='text-align:center'>3 براكين غيروا التاريخ</h1>${htmlBody}</body></html>`;
+        filename = 'Long_Viral_Volcano_Script.doc';
+        mimeType = 'application/msword;charset=utf-8';
+    } else {
+        return;
+    }
+    const blob = new Blob(['\ufeff', content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('تم التحميل: ' + filename);
+}
+function copyToClipboard() {
+    const label = document.getElementById('copyText');
+    const old = label.innerText;
+    const onSuccess = () => {
+        label.innerText = 'تم النسخ!';
+        showToast('تم نسخ السكريبت بالكامل');
+        setTimeout(() => { label.innerText = old; }, 2000);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(rawText).then(onSuccess).catch(fallbackCopy);
+    } else {
+        fallbackCopy();
+    }
+    function fallbackCopy() {
+        const ta = document.createElement('textarea');
+        ta.value = rawText;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        onSuccess();
+    }
+}
+(function initStats() {
+    const words = rawText.trim().split(/\s+/).length;
+    const minutes = Math.max(1, Math.round(words / 150));
+    document.getElementById('scriptStats').textContent =
+        `${words.toLocaleString('ar-EG')} كلمة · ~${minutes} دقيقة تعليق صوتي · 7 أقسام`;
+})();
+</script>
 </body>
 </html>
