@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة إخراج كراكاتوا - الاسكريبت التفاعلي</title>
+    
+    <!-- تحميل مكتبة Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- تحميل خطوط جوجل (Cairo) لدعم اللغة العربية بشكل احترافي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- تحميل أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        volcano: {
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            900: '#7c2d12',
+                            dark: '#111827',
+                            darker: '#030712',
+                            card: '#1f2937'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #030712; /* volcano-darker */
+            color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /* منع تحديد النص بالماوس لحماية المحتوى */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .glass-panel {
+            background: rgba(31, 41, 55, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background-color: #ea580c; /* volcano-600 */
+            color: white;
+            border-color: #ea580c;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* تنسيق مخصص للنص الكامل */
+        .script-text p {
+            margin-bottom: 1.25rem;
+            line-height: 1.8;
+            font-size: 1.125rem;
+        }
+        
+        /* تأثير النبض البسيط للأيقونات */
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+
+    <div class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+        
+        <!-- Header Section -->
+        <header class="text-center mb-10">
+            <div class="inline-block p-4 rounded-full bg-volcano-900/30 border border-volcano-500/30 mb-4">
+                <i class="fa-solid fa-volcano text-4xl text-volcano-500 pulse-icon"></i>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-3 tracking-tight">
+                كراكاتوا <span class="text-volcano-500">غضب الأرض</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto">
+                لوحة إخراج تفاعلية لقصة أعنف انفجار بركاني في التاريخ المسجل.
+            </p>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="inline-flex glass-panel rounded-full p-1 w-full max-w-md">
+                <button onclick="switchTab('full-script')" id="btn-full-script" class="tab-btn active flex-1 py-3 px-6 rounded-full text-sm sm:text-base font-bold text-gray-300 hover:text-white outline-none focus:outline-none">
+                    <i class="fa-solid fa-file-lines ml-2"></i> النص الكامل
+                </button>
+                <button onclick="switchTab('scenes')" id="btn-scenes" class="tab-btn flex-1 py-3 px-6 rounded-full text-sm sm:text-base font-bold text-gray-300 hover:text-white outline-none focus:outline-none">
+                    <i class="fa-solid fa-clapperboard ml-2"></i> تقسيم المشاهد
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 1: Full Script Content -->
+        <div id="full-script" class="tab-content active">
+            <div class="glass-panel rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+                <!-- Decorative accent -->
+                <div class="absolute top-0 right-0 w-2 h-full bg-gradient-to-b from-volcano-500 to-red-800"></div>
+                
+                <div class="flex items-center justify-between mb-8 border-b border-gray-700 pb-4">
+                    <h2 class="text-2xl font-bold text-white flex items-center">
+                        <i class="fa-solid fa-microphone-lines text-volcano-500 ml-3"></i> اسكريبت التعليق الصوتي
+                    </h2>
+                </div>
+
+                <div class="script-text text-gray-200 text-right font-medium" id="script-text-container">
+                    <p>تخيل تسمع صوت انفجار…</p>
+                    <p>مش من شارعك…</p>
+                    <p>ولا من مدينتك…</p>
+                    <p>ولا حتى من بلدك.</p>
+                    <p class="text-volcano-100 font-bold text-2xl py-2">ده صوت اتسمع على بُعد آلاف الكيلومترات.</p>
+                    <p>في يوم 27 أغسطس سنة 1883،<br>
+                    انفجر بركان كراكاتوا في مضيق سوندا،<br>
+                    بين جزيرتي جاوة وسومطرة، في إندونيسيا الحالية.</p>
+                    <p>بس الكارثة ما بدأتش فجأة.</p>
+                    <p>من شهر مايو، السفن اللي كانت معدية من المنطقة بدأت تلاحظ دخان ورماد وانفجارات صغيرة طالعة من الجزيرة.</p>
+                    <p>الناس وقتها اتعاملت مع المشهد كأنه شيء غريب ومثير…<br>
+                    لكن محدش كان متخيل إن ده مجرد إنذار قبل واحدة من أعنف الكوارث الطبيعية في التاريخ.</p>
+                    <p>وفي صباح 27 أغسطس…<br>
+                    كراكاتوا انفجر بقوة مرعبة.</p>
+                    <p>الانفجار كان ضخم لدرجة إن جزء كبير من الجزيرة انهار في البحر،<br>
+                    والانهيار ده عمل موجات تسونامي هائلة،<br>
+                    وصل ارتفاعها في بعض التقديرات لقريب من 40 متر…<br>
+                    <span class="text-volcano-500 font-bold">يعني تقريبًا قد عمارة من 12 أو 13 دور.</span></p>
+                    <p>الموجات اتحركت ناحية سواحل جاوة وسومطرة،<br>
+                    وضربت قرى ومدن كاملة.</p>
+                    <p>في لحظات…<br>
+                    أماكن اختفت،<br>
+                    سواحل اتغير شكلها،<br>
+                    وعائلات كاملة اتشردت.</p>
+                    <p>والنتيجة كانت كارثية:<br>
+                    حوالي 36 ألف شخص فقدوا حياتهم،<br>
+                    ومعظمهم ماتوا بسبب التسونامي، مش بسبب الحمم البركانية نفسها.</p>
+                    <p>وقتها المنطقة كانت تحت حكم جزر الهند الشرقية الهولندية،<br>
+                    وماكانش فيه نظام إنذار مبكر،<br>
+                    ولا خطط إخلاء سريعة زي اللي ممكن نشوفها النهارده.</p>
+                    <p>الإدارة وقتها واجهت كارثة أكبر من قدرتها:<br>
+                    قرى مدمرة،<br>
+                    طرق وسواحل متغيرة،<br>
+                    وسكان محتاجين إنقاذ ومساعدة وسط فوضى ضخمة.</p>
+                    <p>لكن تأثير كراكاتوا ماوقفش عند إندونيسيا.</p>
+                    <p>الرماد والغازات طلعوا لطبقات عالية جدًا في الجو،<br>
+                    ولفّوا حوالين العالم،<br>
+                    وخلّوا السماء تتلون بغروب أحمر غريب في بلاد بعيدة،<br>
+                    وساهموا في انخفاض درجات الحرارة لفترة بعد الانفجار.</p>
+                    <p>كراكاتوا ماكانش مجرد بركان انفجر.</p>
+                    <p class="text-xl font-bold text-white border-r-4 border-volcano-500 pr-4 mt-6">
+                    ده كان صوت الأرض وهي بتصرخ…<br>
+                    صوت وصل لآلاف الكيلومترات،<br>
+                    وكارثة خلت العالم كله يفهم إن غضب الطبيعة…<br>
+                    ممكن يغيّر شكل الخريطة في لحظة.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Scenes Breakdown Content -->
+        <div id="scenes" class="tab-content">
+            <div class="space-y-6">
+                
+                <!-- Scene 1 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">01</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الخطفة (Hook)</span>
+                            <span class="mt-2 text-xs bg-gray-900 px-2 py-1 rounded text-gray-300">00:00 - 00:05</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-xl text-white font-semibold leading-relaxed mb-4">
+                                "تخيل تسمع صوت انفجار… مش من شارعك… ولا من مدينتك… ولا حتى من بلدك. ده صوت اتسمع على بُعد آلاف الكيلومترات."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> شاشة سوداء أو لقطات سريعة جداً لشوارع مظلمة، تليها خريطة لكوكب الأرض تومض من نقطة واحدة.
+                                </div>
+                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> هدوء تام يقطعه صوت انفجار مكتوم (Sub-bass boom) ثم تصاعد موسيقى غامضة.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 2 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">02</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">التمهيد (Setup)</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                                "في يوم 27 أغسطس سنة 1883، انفجر بركان كراكاتوا في مضيق سوندا، بين جزيرتي جاوة وسومطرة، في إندونيسيا الحالية."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> خريطة قديمة (Vintage Map) زووم إن على إندونيسيا، مع تحديد جاوة وسومطرة.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 3 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">03</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الهدوء قبل العاصفة</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                                "بس الكارثة ما بدأتش فجأة. من شهر مايو، السفن اللي معدية بدأت تلاحظ دخان ورماد وانفجارات صغيرة... الناس اتعاملت مع المشهد كأنه شيء غريب ومثير… لكن محدش كان متخيل إن ده إنذار لـ أعنف كارثة."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> صور أرشيفية أو ذكاء اصطناعي لسفن شراعية في البحر تراقب عمود دخان صغير من بعيد.
+                                </div>
+                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> أصوات رياح بحرية، طيور نورس، ثم يبدأ الإيقاع الموسيقي في التوتر تدريجياً.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 4 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-red-900 hover:border-red-500 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-red-900/20 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700 relative">
+                            <div class="absolute inset-0 bg-gradient-to-t from-red-900/40 to-transparent"></div>
+                            <span class="text-red-500 font-black text-4xl mb-1 relative z-10">04</span>
+                            <span class="text-red-300 font-bold uppercase tracking-wider text-sm relative z-10">الذروة (Climax)</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-xl text-white font-bold leading-relaxed mb-4">
+                                "وفي صباح 27 أغسطس… كراكاتوا انفجر بقوة مرعبة. الانفجار كان ضخم لدرجة إن جزء كبير من الجزيرة انهار في البحر، والانهيار ده عمل موجات تسونامي هائلة، وصل ارتفاعها لـ 40 متر… يعني تقريبًا قد عمارة من 12 أو 13 دور."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> لقطات انفجار بركاني عنيف، يعقبها رسم توضيحي أو 3D يوضح ارتفاع الموجة (40 متر) مقارنة بعمارة سكنية.
+                                </div>
+                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> مؤثر صوتي لانفجار ضخم يتبعه صوت هدير أمواج مرعب (Rumbling water).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 5 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">05</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الدمار الكامل</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                                "الموجات اتحركت ناحية سواحل جاوة وسومطرة، وضربت قرى ومدن كاملة. في لحظات… أماكن اختفت، سواحل اتغير شكلها، وعائلات كاملة اتشردت. حوالي 36 ألف شخص فقدوا حياتهم."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> لقطات بطيئة (Slow-mo) للخراب، أشجار مدمرة، وبحر هائج. ظهور رقم "36,000" على الشاشة ببنط عريض.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 6 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">06</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">العجز الإداري</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                                "وقتها المنطقة كانت تحت حكم جزر الهند الشرقية الهولندية، وماكانش فيه نظام إنذار مبكر... الإدارة واجهت كارثة أكبر من قدرتها: قرى مدمرة وسكان محتاجين إنقاذ وسط فوضى ضخمة."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> صور تاريخية بالأبيض والأسود للمسؤولين في هذا العصر أو برقيات التلغراف.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 7 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">07</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">التأثير العالمي</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-lg text-gray-200 leading-relaxed mb-4">
+                                "لكن تأثير كراكاتوا ماوقفش عند إندونيسيا. الرماد والغازات طلعوا لطبقات عالية، ولفّوا حوالين العالم، وخلّوا السماء تتلون بغروب أحمر غريب، وساهموا في انخفاض درجات الحرارة."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> أنيميشن للرماد يغطي الكرة الأرضية، ثم صورة لغروب شمس بلون أحمر دموي أو برتقالي داكن (مثل لوحة الصرخة المقتبسة من نفس الحدث).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scene 8 -->
+                <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-volcano-500/50 transition duration-300">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="bg-gray-800 p-4 md:w-1/4 flex flex-col justify-center items-center border-b md:border-b-0 md:border-l border-gray-700">
+                            <span class="text-volcano-500 font-black text-4xl mb-1">08</span>
+                            <span class="text-gray-400 font-bold uppercase tracking-wider text-sm">الخاتمة (Outro)</span>
+                        </div>
+                        <div class="p-5 md:w-3/4 flex flex-col justify-between">
+                            <p class="text-xl text-white font-bold leading-relaxed mb-4 border-r-4 border-volcano-500 pr-3">
+                                "كراكاتوا ماكانش مجرد بركان انفجر. ده كان صوت الأرض وهي بتصرخ… صوت وصل لآلاف الكيلومترات، وكارثة خلت العالم كله يفهم إن غضب الطبيعة… ممكن يغيّر شكل الخريطة في لحظة."
+                            </p>
+                            <div class="flex flex-wrap gap-3 mt-auto">
+                                <div class="bg-blue-900/30 text-blue-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-eye ml-2"></i> <strong>بصري:</strong> لقطة واسعة جداً (Wide shot) للمحيط الهادي، ثم تظهر دعوة للتفاعل (Follow/Like).
+                                </div>
+                                <div class="bg-yellow-900/30 text-yellow-300 text-sm py-1.5 px-3 rounded flex items-center">
+                                    <i class="fa-solid fa-music ml-2"></i> <strong>صوتي:</strong> الموسيقى تصل لذروة درامية ثم تنقطع فجأة مع آخر كلمة (في لحظة).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // دالة التبديل بين التابات
+        function switchTab(tabId) {
+            // إخفاء كل المحتوى
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // إزالة التنشيط من كل الأزرار
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-gray-300');
+            });
+
+            // إظهار المحتوى المطلوب وتنشيط الزر
+            document.getElementById(tabId).classList.add('active');
+            
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('text-gray-300');
+        }
+
+        // منع النقر بزر الماوس الأيمن (Context Menu) لحماية المحتوى
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // منع اختصارات الكيبورد الخاصة بالنسخ والتحديد (Ctrl+C, Ctrl+A, Cmd+C, Cmd+A)
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && (event.key === 'c' || event.key === 'a' || event.key === 'x' || event.key === 'C' || event.key === 'A' || event.key === 'X')) {
+                event.preventDefault();
+            }
+        });
+
+        // منع حدث النسخ نفسه كإجراء أمان إضافي
+        document.addEventListener('copy', function(event) {
+            event.preventDefault();
+        });
+    </script>
+</body>
+</html>
